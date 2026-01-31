@@ -3,11 +3,13 @@ package com.highpass.runspot.session.service;
 import com.highpass.runspot.auth.domain.Gender;
 import com.highpass.runspot.auth.domain.User;
 import com.highpass.runspot.auth.repository.UserRepository;
+import com.highpass.runspot.session.domain.AttendanceStatus;
 import com.highpass.runspot.session.domain.GenderPolicy;
 import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.domain.Session;
 import com.highpass.runspot.session.domain.SessionParticipant;
 import com.highpass.runspot.session.domain.SessionStatus;
+import com.highpass.runspot.session.dto.AttendanceUpdateRequest;
 import com.highpass.runspot.session.dto.SessionCreateRequest;
 import com.highpass.runspot.session.dto.SessionJoinRequest;
 import com.highpass.runspot.session.dto.SessionParticipantResponse;
@@ -155,6 +157,44 @@ public class SessionService {
             .orElseThrow(() -> new IllegalArgumentException("신청 정보를 찾을 수 없습니다."));
 
         participant.reject();
+    }
+
+    public List<SessionParticipantResponse> getAttendanceList(Long userId, Long sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new IllegalArgumentException("세션을 찾을 수 없습니다. ID: " + sessionId));
+
+        // 일단 호스트만 보는 것으로 구현
+        if (!Objects.equals(session.getHostUser().getId(), userId)) {
+            throw new IllegalStateException("호스트만 출석부를 조회할 수 있습니다.");
+        }
+
+        // 승인된 참여자만 조회
+        List<SessionParticipant> participants = sessionParticipantRepository.findBySessionIdAndStatus(sessionId, ParticipationStatus.APPROVED);
+
+        return participants.stream()
+            .map(SessionParticipantResponse::from)
+            .toList();
+    }
+
+    @Transactional
+    public void updateAttendance(Long userId, Long sessionId, Long participationId, AttendanceUpdateRequest request) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new IllegalArgumentException("세션을 찾을 수 없습니다. ID: " + sessionId));
+
+        // 호스트 검증
+        if (!Objects.equals(session.getHostUser().getId(), userId)) {
+            throw new IllegalStateException("호스트만 출석 체크를 할 수 있습니다.");
+        }
+
+        SessionParticipant participant = sessionParticipantRepository.findById(participationId)
+            .orElseThrow(() -> new IllegalArgumentException("참여 정보를 찾을 수 없습니다."));
+
+        // 해당 세션의 참여자인지 확인
+        if (!participant.getSession().getId().equals(sessionId)) {
+            throw new IllegalArgumentException("해당 세션의 참여자가 아닙니다.");
+        }
+
+        participant.updateAttendance(request.attendanceStatus());
     }
 
     private void validateGenderPolicy(GenderPolicy policy, Gender userGender) {

@@ -1,6 +1,7 @@
 package com.highpass.runspot.session.controller;
 
 import com.highpass.runspot.session.domain.ParticipationStatus;
+import com.highpass.runspot.session.dto.AttendanceUpdateRequest;
 import com.highpass.runspot.session.dto.SessionCreateRequest;
 import com.highpass.runspot.session.dto.SessionJoinRequest;
 import com.highpass.runspot.session.dto.SessionParticipantResponse;
@@ -12,6 +13,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -126,6 +128,36 @@ public class SessionController {
         }
 
         sessionService.rejectJoinRequest(loginUserId, sessionId, participationId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{sessionId}/attendance")
+    public ResponseEntity<List<SessionParticipantResponse>> getAttendanceList(
+        @PathVariable Long sessionId,
+        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+    ) {
+        if (loginUserId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+
+        List<SessionParticipantResponse> responses = sessionService.getAttendanceList(loginUserId, sessionId);
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @PatchMapping("/{sessionId}/participants/{participationId}/attendance")
+    public ResponseEntity<Void> updateAttendance(
+        @PathVariable Long sessionId,
+        @PathVariable Long participationId,
+        @Valid @RequestBody AttendanceUpdateRequest request,
+        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+    ) {
+        if (loginUserId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+
+        sessionService.updateAttendance(loginUserId, sessionId, participationId, request);
 
         return ResponseEntity.ok().build();
     }

@@ -72,4 +72,8 @@ public class SessionParticipant extends BaseTimeEntity {
     public void reject() {
         this.status = ParticipationStatus.REJECTED;
     }
+
+    public void updateAttendance(AttendanceStatus attendanceStatus) {
+        this.attendanceStatus = attendanceStatus;
+    }
 }
