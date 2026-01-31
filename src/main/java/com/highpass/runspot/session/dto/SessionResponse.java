@@ -10,7 +10,7 @@ import java.util.List;
 
 public record SessionResponse(
     Long id,
-    Long hostUserId, // 추후 UserResponse 등으로 확장 가능
+    Long hostUserId,
     String title,
     RunType runType,
     String locationName,

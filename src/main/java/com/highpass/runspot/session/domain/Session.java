@@ -84,7 +84,7 @@ public class Session extends BaseTimeEntity {
     @Builder.Default
     private SessionStatus status = SessionStatus.OPEN; // ENUM() NOT NULL DEFAULT 'OPEN'
 
-    // ---- 비즈니스 로직 ----
+    // 비즈니스 로직
     public void close(Long userId) {
         validateHost(userId);
         this.status = SessionStatus.CLOSED;
@@ -101,7 +101,7 @@ public class Session extends BaseTimeEntity {
         }
     }
 
-    // ---- JSON 요소 타입 (route_polyline) ----
+    // JSON 요소 타입 (route_polyline)
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor

@@ -13,5 +13,7 @@ public interface SessionParticipantRepository extends JpaRepository<SessionParti
 
     List<SessionParticipant> findBySessionId(Long sessionId);
 
+    List<SessionParticipant> findBySessionIdAndStatus(Long sessionId, ParticipationStatus status);
+
     long countBySessionIdAndStatus(Long sessionId, ParticipationStatus status);
 }

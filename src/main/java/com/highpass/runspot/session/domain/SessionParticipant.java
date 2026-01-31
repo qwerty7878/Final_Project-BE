@@ -5,10 +5,6 @@ import com.highpass.runspot.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -67,4 +63,13 @@ public class SessionParticipant extends BaseTimeEntity {
 
     @Column(name = "completed_distance_km", precision = 8, scale = 2)
     private BigDecimal completedDistanceKm; // 완주 거리(00.00), 미완주는 null
+
+    // 비즈니스 로직
+    public void approve() {
+        this.status = ParticipationStatus.APPROVED;
+    }
+
+    public void reject() {
+        this.status = ParticipationStatus.REJECTED;
+    }
 }

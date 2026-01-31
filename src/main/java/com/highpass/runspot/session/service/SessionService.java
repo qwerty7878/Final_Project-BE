@@ -10,9 +10,12 @@ import com.highpass.runspot.session.domain.SessionParticipant;
 import com.highpass.runspot.session.domain.SessionStatus;
 import com.highpass.runspot.session.dto.SessionCreateRequest;
 import com.highpass.runspot.session.dto.SessionJoinRequest;
+import com.highpass.runspot.session.dto.SessionParticipantResponse;
 import com.highpass.runspot.session.dto.SessionResponse;
 import com.highpass.runspot.session.repository.SessionParticipantRepository;
 import com.highpass.runspot.session.repository.SessionRepository;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,6 +96,65 @@ public class SessionService {
             .build(); // status 기본값 REQUESTED, attendanceStatus 기본값 DEFAULT
 
         sessionParticipantRepository.save(participant);
+    }
+
+    public List<SessionParticipantResponse> getJoinRequests(Long userId, Long sessionId, ParticipationStatus status) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new IllegalArgumentException("세션을 찾을 수 없습니다. ID: " + sessionId));
+
+        // 호스트 검증
+        if (!Objects.equals(session.getHostUser().getId(), userId)) {
+            throw new IllegalStateException("호스트만 신청 목록을 조회할 수 있습니다.");
+        }
+
+        List<SessionParticipant> participants;
+        if (status == null) {
+            participants = sessionParticipantRepository.findBySessionId(sessionId);
+        } else {
+            participants = sessionParticipantRepository.findBySessionIdAndStatus(sessionId, status);
+        }
+
+        return participants.stream()
+            .map(SessionParticipantResponse::from)
+            .toList();
+    }
+
+    @Transactional
+    public void approveJoinRequest(Long userId, Long sessionId, Long participationId) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new IllegalArgumentException("세션을 찾을 수 없습니다. ID: " + sessionId));
+
+        // 호스트 검증
+        if (!Objects.equals(session.getHostUser().getId(), userId)) {
+            throw new IllegalStateException("호스트만 승인할 수 있습니다.");
+        }
+
+        SessionParticipant participant = sessionParticipantRepository.findById(participationId)
+            .orElseThrow(() -> new IllegalArgumentException("신청 정보를 찾을 수 없습니다."));
+
+        // 인원 마감 체크 (승인 시점에 다시 한번 체크)
+        long approvedCount = sessionParticipantRepository.countBySessionIdAndStatus(sessionId, ParticipationStatus.APPROVED);
+        if (approvedCount >= session.getCapacity()) {
+            throw new IllegalStateException("모집 인원이 마감되어 승인할 수 없습니다.");
+        }
+
+        participant.approve();
+    }
+
+    @Transactional
+    public void rejectJoinRequest(Long userId, Long sessionId, Long participationId) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new IllegalArgumentException("세션을 찾을 수 없습니다. ID: " + sessionId));
+
+        // 호스트 검증
+        if (!Objects.equals(session.getHostUser().getId(), userId)) {
+            throw new IllegalStateException("호스트만 거절할 수 있습니다.");
+        }
+
+        SessionParticipant participant = sessionParticipantRepository.findById(participationId)
+            .orElseThrow(() -> new IllegalArgumentException("신청 정보를 찾을 수 없습니다."));
+
+        participant.reject();
     }
 
     private void validateGenderPolicy(GenderPolicy policy, Gender userGender) {
