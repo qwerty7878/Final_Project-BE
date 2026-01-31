@@ -53,12 +53,6 @@ public class Session extends BaseTimeEntity {
     @Column(name = "location_name", nullable = false, length = 80)
     private String locationName; // VARCHAR(80) NOT NULL
 
-//    @Column(name = "location_x", nullable = false, precision = 10, scale = 7)
-//    private BigDecimal locationX; // DECIMAL(10,7) 경도(lng)
-//
-//    @Column(name = "location_y", nullable = false, precision = 10, scale = 7)
-//    private BigDecimal locationY; // DECIMAL(10,7) 위도(lat)
-
     @Column(columnDefinition = "GEOMETRY SRID 4326", nullable = false)
     private Point location;
 
