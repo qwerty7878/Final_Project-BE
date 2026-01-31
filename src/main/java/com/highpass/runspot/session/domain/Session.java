@@ -62,8 +62,8 @@ public class Session extends BaseTimeEntity {
     @Column(name = "route_polyline", nullable = false, columnDefinition = "json")
     private List<RoutePoint> routePolyline;
 
-    @Column(name = "target_distance_km", nullable = false, precision = 2, scale = 2)
-    private BigDecimal targetDistanceKm; // DECIMAL(2,2) NOT NULL
+    @Column(name = "target_distance_km", nullable = false, precision = 5, scale = 2)
+    private BigDecimal targetDistanceKm; // DECIMAL(5,2) NOT NULL
 
     @Column(name = "avg_pace_sec", nullable = false)
     private Integer avgPaceSec; // INT NOT NULL (초/km)
