@@ -33,7 +33,6 @@ public class SessionController {
         @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
-            // TODO: 추후 401 Unauthorized를 반환하는 커스텀 예외로 변경
             throw new IllegalStateException("로그인이 필요합니다.");
         }
 
