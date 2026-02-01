@@ -1,4 +1,4 @@
-package com.highpass.runspot.session.dto;
+package com.highpass.runspot.session.service.dto.request;
 
 import jakarta.validation.constraints.Size;
 

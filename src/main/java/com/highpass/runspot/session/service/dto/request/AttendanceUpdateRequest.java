@@ -1,4 +1,4 @@
-package com.highpass.runspot.session.dto;
+package com.highpass.runspot.session.service.dto.request;
 
 import com.highpass.runspot.session.domain.AttendanceStatus;
 import jakarta.validation.constraints.NotNull;

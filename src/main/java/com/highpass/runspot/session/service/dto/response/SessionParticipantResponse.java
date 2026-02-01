@@ -1,4 +1,4 @@
-package com.highpass.runspot.session.dto;
+package com.highpass.runspot.session.service.dto.response;
 
 import com.highpass.runspot.auth.domain.Gender;
 import com.highpass.runspot.session.domain.AttendanceStatus;

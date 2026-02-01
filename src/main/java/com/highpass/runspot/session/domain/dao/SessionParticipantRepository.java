@@ -1,4 +1,4 @@
-package com.highpass.runspot.session.repository;
+package com.highpass.runspot.session.domain.dao;
 
 import com.highpass.runspot.auth.domain.User;
 import com.highpass.runspot.session.domain.ParticipationStatus;

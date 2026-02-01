@@ -1,4 +1,4 @@
-package com.highpass.runspot.session.repository;
+package com.highpass.runspot.session.domain.dao;
 
 import com.highpass.runspot.session.domain.Session;
 import org.springframework.data.jpa.repository.JpaRepository;

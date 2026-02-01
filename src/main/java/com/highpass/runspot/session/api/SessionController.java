@@ -1,11 +1,11 @@
-package com.highpass.runspot.session.controller;
+package com.highpass.runspot.session.api;
 
 import com.highpass.runspot.session.domain.ParticipationStatus;
-import com.highpass.runspot.session.dto.AttendanceUpdateRequest;
-import com.highpass.runspot.session.dto.SessionCreateRequest;
-import com.highpass.runspot.session.dto.SessionJoinRequest;
-import com.highpass.runspot.session.dto.SessionParticipantResponse;
-import com.highpass.runspot.session.dto.SessionResponse;
+import com.highpass.runspot.session.service.dto.request.AttendanceUpdateRequest;
+import com.highpass.runspot.session.service.dto.request.SessionCreateRequest;
+import com.highpass.runspot.session.service.dto.request.SessionJoinRequest;
+import com.highpass.runspot.session.service.dto.response.SessionParticipantResponse;
+import com.highpass.runspot.session.service.dto.response.SessionResponse;
 import com.highpass.runspot.session.service.SessionService;
 import jakarta.validation.Valid;
 import java.net.URI;
