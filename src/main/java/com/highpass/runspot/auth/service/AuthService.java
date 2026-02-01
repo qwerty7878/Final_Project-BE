@@ -1,4 +1,4 @@
-package com.highpass.runspot.auth.application;
+package com.highpass.runspot.auth.service;
 
 import com.highpass.runspot.auth.api.dto.LoginRequest;
 import com.highpass.runspot.auth.api.dto.SignupRequest;

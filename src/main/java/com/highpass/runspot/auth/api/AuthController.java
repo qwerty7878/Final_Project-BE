@@ -4,7 +4,7 @@ import com.highpass.runspot.auth.api.dto.LoginRequest;
 import com.highpass.runspot.auth.api.dto.LoginResponse;
 import com.highpass.runspot.auth.api.dto.SignupRequest;
 import com.highpass.runspot.auth.api.dto.SignupResponse;
-import com.highpass.runspot.auth.application.AuthService;
+import com.highpass.runspot.auth.service.AuthService;
 import com.highpass.runspot.auth.domain.User;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
