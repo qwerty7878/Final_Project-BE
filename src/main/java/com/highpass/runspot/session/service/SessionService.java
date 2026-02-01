@@ -2,7 +2,7 @@ package com.highpass.runspot.session.service;
 
 import com.highpass.runspot.auth.domain.Gender;
 import com.highpass.runspot.auth.domain.User;
-import com.highpass.runspot.auth.repository.UserRepository;
+import com.highpass.runspot.auth.domain.dao.UserRepository;
 import com.highpass.runspot.session.domain.GenderPolicy;
 import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.domain.Session;
