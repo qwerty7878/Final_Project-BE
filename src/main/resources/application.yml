@@ -1,10 +1,13 @@
 spring:
+  config:
+    import:
+      - "optional:classpath:application-secret.yml"
+      - "optional:file:.env[.properties]"
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,7 +15,6 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
-
   session:
     store-type: none # 기본 인메모리 세션 사용
     timeout: 1800 # 30분 (초 단위)
@@ -27,3 +29,9 @@ server:
         http-only: true # XSS 공격 방지
         secure: false # 개발 환경에서는 false, 프로덕션에서는 true (HTTPS 필요)
         same-site: lax # CSRF 공격 방지
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
