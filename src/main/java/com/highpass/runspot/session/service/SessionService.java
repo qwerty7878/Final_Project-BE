@@ -94,7 +94,7 @@ public class SessionService {
             .session(session)
             .user(user)
             .messageToHost(request.messageToHost())
-            .build(); // status 기본값 REQUESTED, attendanceStatus 기본값 DEFAULT
+            .build(); // status 기본값 REQUESTED, attendanceStatus 기본값 ABSENT
 
         sessionParticipantRepository.save(participant);
     }

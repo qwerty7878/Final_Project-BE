@@ -32,7 +32,7 @@ public class SessionController {
     @PostMapping
     public ResponseEntity<SessionResponse> createSession(
         @Valid @RequestBody SessionCreateRequest request,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -47,7 +47,7 @@ public class SessionController {
     @PostMapping("/{sessionId}/close")
     public ResponseEntity<Void> closeSession(
         @PathVariable Long sessionId,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -61,7 +61,7 @@ public class SessionController {
     @PostMapping("/{sessionId}/finish")
     public ResponseEntity<Void> finishSession(
         @PathVariable Long sessionId,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -76,7 +76,7 @@ public class SessionController {
     public ResponseEntity<Void> joinSession(
         @PathVariable Long sessionId,
         @Valid @RequestBody SessionJoinRequest request,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -91,7 +91,7 @@ public class SessionController {
     public ResponseEntity<List<SessionParticipantResponse>> getJoinRequests(
         @PathVariable Long sessionId,
         @RequestParam(required = false) ParticipationStatus status,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -106,7 +106,7 @@ public class SessionController {
     public ResponseEntity<Void> approveJoinRequest(
         @PathVariable Long sessionId,
         @PathVariable Long participationId,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -121,7 +121,7 @@ public class SessionController {
     public ResponseEntity<Void> rejectJoinRequest(
         @PathVariable Long sessionId,
         @PathVariable Long participationId,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -135,7 +135,7 @@ public class SessionController {
     @GetMapping("/{sessionId}/attendance")
     public ResponseEntity<List<SessionParticipantResponse>> getAttendanceList(
         @PathVariable Long sessionId,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
@@ -151,7 +151,7 @@ public class SessionController {
         @PathVariable Long sessionId,
         @PathVariable Long participationId,
         @Valid @RequestBody AttendanceUpdateRequest request,
-        @SessionAttribute(name = "loginUserId", required = false) Long loginUserId
+        @SessionAttribute(name = "userId", required = false) Long loginUserId
     ) {
         if (loginUserId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
