@@ -1,5 +1,13 @@
 package com.highpass.runspot.auth.domain;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum Gender {
-    MALE, FEMALE
+    MALE("남성"),
+    FEMALE("여성");
+
+    private final String description;
 }
