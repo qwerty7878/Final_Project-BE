@@ -18,7 +18,7 @@ public class SessionController {
 
     private final SessionQueryService sessionQueryService;
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<List<SessionSearchResponse>> searchSessionByName(@RequestParam("q") final String query) {
         final List<SessionSearchResponse> searchResponses = sessionQueryService.searchSessionByName(query);
         return ResponseEntity.ok(searchResponses);

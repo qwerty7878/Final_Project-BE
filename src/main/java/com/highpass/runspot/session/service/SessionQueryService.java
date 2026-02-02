@@ -12,20 +12,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SessionQueryService {
 
     private final SessionRepository sessionRepository;
 
     public List<SessionSearchResponse> searchSessionByName(final String query) {
-        if (query == null || query.trim().isEmpty()) {
-            throw new SessionException(SessionErrorCode.INVALID_SEARCH_QUERY);
-        }
+        validateQuery(query);
         final List<Session> findSessions = sessionRepository.findByStatusAndTitleContainingOrderByIdDesc(OPEN, query);
         return findSessions.stream()
                 .map(SessionSearchResponse::from)
                 .toList();
+    }
+
+    private void validateQuery(final String query) {
+        if (query == null || query.trim().isEmpty()) {
+            throw new SessionException(SessionErrorCode.INVALID_SEARCH_QUERY);
+        }
     }
 }

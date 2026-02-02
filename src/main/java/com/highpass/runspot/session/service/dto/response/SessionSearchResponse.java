@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record SessionSearchResponse(
+        Long id,
         String title,
         LocalDateTime startAt,
         String locationName,
@@ -20,6 +21,7 @@ public record SessionSearchResponse(
 ) {
     public static SessionSearchResponse from(Session session) {
         return SessionSearchResponse.builder()
+                .id(session.getId())
                 .title(session.getTitle())
                 .startAt(session.getStartAt())
                 .locationName(session.getLocationName())
