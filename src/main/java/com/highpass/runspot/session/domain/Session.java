@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,8 +61,8 @@ public class Session extends BaseTimeEntity {
     @Column(name = "route_polyline", nullable = false, columnDefinition = "json")
     private List<RoutePoint> routePolyline;
 
-    @Column(name = "target_distance_km", nullable = false, precision = 2, scale = 2)
-    private BigDecimal targetDistanceKm; // DECIMAL(2,2) NOT NULL
+    @Column(name = "target_distance_km", nullable = false, precision = 5, scale = 2)
+    private BigDecimal targetDistanceKm; // DECIMAL(5,2) NOT NULL
 
     @Column(name = "avg_pace_sec", nullable = false)
     private Integer avgPaceSec; // INT NOT NULL (초/km)
@@ -81,7 +82,24 @@ public class Session extends BaseTimeEntity {
     @Builder.Default
     private SessionStatus status = SessionStatus.OPEN; // ENUM() NOT NULL DEFAULT 'OPEN'
 
-    // ---- JSON 요소 타입 (route_polyline) ----
+    // 비즈니스 로직
+    public void close(Long userId) {
+        validateHost(userId);
+        this.status = SessionStatus.CLOSED;
+    }
+
+    public void finish(Long userId) {
+        validateHost(userId);
+        this.status = SessionStatus.FINISHED;
+    }
+
+    private void validateHost(Long userId) {
+        if (!Objects.equals(this.hostUser.getId(), userId)) {
+            throw new IllegalStateException("세션 호스트만 변경할 수 있습니다.");
+        }
+    }
+
+    // JSON 요소 타입 (route_polyline)
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
