@@ -47,7 +47,7 @@ public class Session extends BaseTimeEntity {
     private String title; // VARCHAR(60) NOT NULL
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "run_type", nullable = false)
+    @Column(name = "run_type", nullable = false, length = 20)
     private RunType runType; // ENUM() NOT NULL
 
     @Column(name = "location_name", nullable = false, length = 80)
@@ -76,11 +76,11 @@ public class Session extends BaseTimeEntity {
     private Integer capacity; // INT NOT NULL
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender_policy", nullable = false)
+    @Column(name = "gender_policy", nullable = false, length = 20)
     private GenderPolicy genderPolicy; // ENUM('MALE_ONLY','FEMALE_ONLY','MIXED') NOT NULL
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     @Builder.Default
     private SessionStatus status = SessionStatus.OPEN; // ENUM() NOT NULL DEFAULT 'OPEN'
 

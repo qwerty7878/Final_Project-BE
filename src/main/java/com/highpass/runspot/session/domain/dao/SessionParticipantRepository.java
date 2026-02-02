@@ -1,11 +1,15 @@
 package com.highpass.runspot.session.domain.dao;
 
 import com.highpass.runspot.auth.domain.User;
+import com.highpass.runspot.session.domain.AttendanceStatus;
 import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.domain.Session;
 import com.highpass.runspot.session.domain.SessionParticipant;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface SessionParticipantRepository extends JpaRepository<SessionParticipant, Long> {
 
@@ -16,4 +20,22 @@ public interface SessionParticipantRepository extends JpaRepository<SessionParti
     List<SessionParticipant> findBySessionIdAndStatus(Long sessionId, ParticipationStatus status);
 
     long countBySessionIdAndStatus(Long sessionId, ParticipationStatus status);
+
+    // 신청한 러닝 목록 조회 (REQUESTED, APPROVED, REJECTED 상태만, 최신순)
+    @Query("SELECT sp FROM SessionParticipant sp " +
+            "WHERE sp.user.id = :userId " +
+            "AND sp.status IN ('REQUESTED', 'APPROVED', 'REJECTED') " +
+            "ORDER BY sp.createdAt DESC")
+    List<SessionParticipant> findAppliedRunnings(@Param("userId") Long userId, Pageable pageable);
+
+    // 최근 참여 내역 조회 (출석한 세션만, 최신순 3개)
+    @Query("SELECT sp FROM SessionParticipant sp " +
+            "WHERE sp.user.id = :userId " +
+            "AND sp.status = 'APPROVED' " +
+            "AND sp.attendanceStatus = 'ATTENDED' " +
+            "ORDER BY sp.session.startAt DESC")
+    List<SessionParticipant> findRecentAttendedRunnings(@Param("userId") Long userId, Pageable pageable);
+
+    // 출석 처리된 세션 개수
+    long countByUserIdAndStatusAndAttendanceStatus(Long userId, ParticipationStatus status, AttendanceStatus attendanceStatus);
 }

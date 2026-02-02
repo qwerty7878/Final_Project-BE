@@ -3,6 +3,8 @@ package com.highpass.runspot.session.service;
 import com.highpass.runspot.auth.domain.Gender;
 import com.highpass.runspot.auth.domain.User;
 import com.highpass.runspot.auth.domain.dao.UserRepository;
+import com.highpass.runspot.auth.service.UserStatsService;
+import com.highpass.runspot.session.domain.AttendanceStatus;
 import com.highpass.runspot.session.domain.GenderPolicy;
 import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.domain.Session;
@@ -29,6 +31,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final SessionParticipantRepository sessionParticipantRepository;
     private final UserRepository userRepository;
+    private final UserStatsService userStatsService;
 
     @Transactional
     public SessionResponse createSession(Long userId, SessionCreateRequest request) {
@@ -193,7 +196,18 @@ public class SessionService {
             throw new IllegalArgumentException("해당 세션의 참여자가 아닙니다.");
         }
 
+        // 기존 출석 상태 확인
+        AttendanceStatus previousStatus = participant.getAttendanceStatus();
+
         participant.updateAttendance(request.attendanceStatus());
+
+        if (previousStatus != AttendanceStatus.ATTENDED
+                && request.attendanceStatus() == AttendanceStatus.ATTENDED) {
+            userStatsService.updateRunningStatsOnAttendance(
+                    participant.getUser().getId(),
+                    session.getTargetDistanceKm()
+            );
+        }
     }
 
     private void validateGenderPolicy(GenderPolicy policy, Gender userGender) {
