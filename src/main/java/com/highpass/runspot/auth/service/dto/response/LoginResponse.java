@@ -1,4 +1,4 @@
-package com.highpass.runspot.auth.api.dto;
+package com.highpass.runspot.auth.service.dto.response;
 
 import com.highpass.runspot.auth.domain.User;
 import lombok.AllArgsConstructor;

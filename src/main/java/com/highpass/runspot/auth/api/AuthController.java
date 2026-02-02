@@ -1,9 +1,9 @@
 package com.highpass.runspot.auth.api;
 
-import com.highpass.runspot.auth.api.dto.LoginRequest;
-import com.highpass.runspot.auth.api.dto.LoginResponse;
-import com.highpass.runspot.auth.api.dto.SignupRequest;
-import com.highpass.runspot.auth.api.dto.SignupResponse;
+import com.highpass.runspot.auth.service.dto.request.LoginRequest;
+import com.highpass.runspot.auth.service.dto.response.LoginResponse;
+import com.highpass.runspot.auth.service.dto.request.SignupRequest;
+import com.highpass.runspot.auth.service.dto.response.SignupResponse;
 import com.highpass.runspot.auth.service.AuthService;
 import com.highpass.runspot.auth.domain.User;
 import jakarta.servlet.http.HttpSession;

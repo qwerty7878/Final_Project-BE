@@ -1,7 +1,7 @@
 package com.highpass.runspot.auth.service;
 
-import com.highpass.runspot.auth.api.dto.LoginRequest;
-import com.highpass.runspot.auth.api.dto.SignupRequest;
+import com.highpass.runspot.auth.service.dto.request.LoginRequest;
+import com.highpass.runspot.auth.service.dto.request.SignupRequest;
 import com.highpass.runspot.auth.domain.User;
 import com.highpass.runspot.auth.domain.dao.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -18,7 +18,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
 
-    private static final String SESSION_USER_KEY = "userId";
+    public static final String SESSION_USER_KEY = "userId";
 
     @Transactional
     public User signup(SignupRequest request) {
