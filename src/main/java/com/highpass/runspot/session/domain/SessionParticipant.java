@@ -55,7 +55,7 @@ public class SessionParticipant extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "attendance_status", nullable = false)
     @Builder.Default
-    private AttendanceStatus attendanceStatus = AttendanceStatus.DEFAULT; // 출석여부
+    private AttendanceStatus attendanceStatus = AttendanceStatus.ABSENT; // 출석여부
 
     @Lob
     @Column(name = "message_to_host")
