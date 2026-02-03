@@ -77,7 +77,8 @@ public class SessionQueryService {
         final Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionException(SessionErrorCode.SESSION_NOT_FOUND));
 
-        final List<SessionParticipant> participants = sessionParticipantRepository.findBySessionIdAndStatus(sessionId, APPROVED);
+        final List<SessionParticipant> participants = sessionParticipantRepository
+                .findBySessionIdAndStatusWithUser(sessionId, ParticipationStatus.APPROVED);
 
         return SessionInfoDetailResponse.from(session, participants);
     }
