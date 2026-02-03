@@ -6,6 +6,7 @@ import com.highpass.runspot.session.service.SessionService;
 import com.highpass.runspot.session.service.dto.request.AttendanceUpdateRequest;
 import com.highpass.runspot.session.service.dto.request.SessionCreateRequest;
 import com.highpass.runspot.session.service.dto.request.SessionJoinRequest;
+import com.highpass.runspot.session.service.dto.response.SessionInfoSummaryResponse;
 import com.highpass.runspot.session.service.dto.response.SessionParticipantResponse;
 import com.highpass.runspot.session.service.dto.response.SessionResponse;
 import com.highpass.runspot.session.service.dto.response.SessionSearchResponse;
@@ -43,6 +44,12 @@ public class SessionController {
         final Slice<SessionSearchResponse> searchResponses = sessionQueryService.searchSessionByName(query,
                 cursorId, size);
         return ResponseEntity.ok(searchResponses);
+    }
+
+    @GetMapping("/{sessionId}/summary")
+    public ResponseEntity<SessionInfoSummaryResponse> getSessionSummary(@PathVariable Long sessionId) {
+        final SessionInfoSummaryResponse response = sessionQueryService.getSessionSummary(sessionId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
