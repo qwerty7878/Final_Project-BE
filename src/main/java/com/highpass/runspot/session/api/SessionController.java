@@ -1,6 +1,5 @@
 package com.highpass.runspot.session.api;
 
-import com.highpass.runspot.common.dto.SliceResponse;
 import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.service.SessionQueryService;
 import com.highpass.runspot.session.service.SessionService;
@@ -13,6 +12,7 @@ import com.highpass.runspot.session.service.dto.response.SessionSearchResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,12 +35,12 @@ public class SessionController {
     private final SessionQueryService sessionQueryService;
 
     @GetMapping("/search")
-    public ResponseEntity<SliceResponse<SessionSearchResponse>> searchSessionByName(
+    public ResponseEntity<Slice<SessionSearchResponse>> searchSessionByName(
             @RequestParam("q") final String query,
             @RequestParam(name = "cursorId", required = false) final Long cursorId,
             @RequestParam(name = "size", required = false, defaultValue = "10") final int size
     ) {
-        final SliceResponse<SessionSearchResponse> searchResponses = sessionQueryService.searchSessionByName(query,
+        final Slice<SessionSearchResponse> searchResponses = sessionQueryService.searchSessionByName(query,
                 cursorId, size);
         return ResponseEntity.ok(searchResponses);
     }
