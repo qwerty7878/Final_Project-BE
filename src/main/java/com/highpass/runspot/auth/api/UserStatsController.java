@@ -2,11 +2,14 @@ package com.highpass.runspot.auth.api;
 
 import static com.highpass.runspot.auth.service.AuthService.SESSION_USER_KEY;
 
+import com.highpass.runspot.auth.service.UserStatsService;
 import com.highpass.runspot.auth.service.dto.response.AppliedRunningsResponse;
 import com.highpass.runspot.auth.service.dto.response.RecentRunningsResponse;
 import com.highpass.runspot.auth.service.dto.response.UserProfileResponse;
-import com.highpass.runspot.auth.service.UserStatsService;
+import com.highpass.runspot.session.service.SessionService;
+import com.highpass.runspot.session.service.dto.response.SessionResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 public class UserStatsController {
 
     private final UserStatsService userStatsService;
+    private final SessionService sessionService;
 
     @Operation(summary = "내 정보 조회", description = "상단의 내 정보를 기반으로 조회합니다.")
     @GetMapping("/me")
@@ -61,5 +65,19 @@ public class UserStatsController {
 
         RecentRunningsResponse response = userStatsService.getRecentRunnings(userId, limit);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "내가 개설한 러닝 조회(호스트)", description = "내가 개설한 러닝 세션 내역 중 3개를 최신순으로 조회합니다.")
+    @GetMapping("/me/runnings/mySession")
+    public ResponseEntity<List<SessionResponse>> getMyHostedSessions(
+            @SessionAttribute(name = SESSION_USER_KEY, required = false) Long userId
+    ) {
+        if (userId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+
+        List<SessionResponse> responses = sessionService.getMyHostedSessions(userId);
+
+        return ResponseEntity.ok(responses);
     }
 }

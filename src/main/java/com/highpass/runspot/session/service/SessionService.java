@@ -210,6 +210,18 @@ public class SessionService {
         }
     }
 
+    public List<SessionResponse> getMyHostedSessions(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
+
+        // OPEN 상태 우선, 그 다음 최신순으로 정렬하여 3개만 조회
+        List<Session> sessions = sessionRepository.findTop3ByHostUserOrderByStatusAscCreatedAtDesc(user);
+
+        return sessions.stream()
+                .map(SessionResponse::from)
+                .toList();
+    }
+
     private void validateGenderPolicy(GenderPolicy policy, Gender userGender) {
         if (policy == GenderPolicy.MALE_ONLY && userGender != Gender.MALE) {
             throw new IllegalArgumentException("남성만 참여 가능한 세션입니다.");
