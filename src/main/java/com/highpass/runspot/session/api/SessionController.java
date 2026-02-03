@@ -1,16 +1,18 @@
 package com.highpass.runspot.session.api;
 
 import com.highpass.runspot.session.domain.ParticipationStatus;
+import com.highpass.runspot.session.service.SessionQueryService;
+import com.highpass.runspot.session.service.SessionService;
 import com.highpass.runspot.session.service.dto.request.AttendanceUpdateRequest;
 import com.highpass.runspot.session.service.dto.request.SessionCreateRequest;
 import com.highpass.runspot.session.service.dto.request.SessionJoinRequest;
 import com.highpass.runspot.session.service.dto.response.SessionParticipantResponse;
 import com.highpass.runspot.session.service.dto.response.SessionResponse;
-import com.highpass.runspot.session.service.SessionService;
+import com.highpass.runspot.session.service.dto.response.SessionSearchResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,14 +22,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/sessions")
+@RequiredArgsConstructor
 public class SessionController {
 
     private final SessionService sessionService;
+    private final SessionQueryService sessionQueryService;
+
+    @GetMapping("/search")
+    public ResponseEntity<Slice<SessionSearchResponse>> searchSessionByName(
+            @RequestParam("q") final String query,
+            @RequestParam(name = "cursorId", required = false) final Long cursorId,
+            @RequestParam(name = "size", required = false, defaultValue = "10") final int size
+    ) {
+        final Slice<SessionSearchResponse> searchResponses = sessionQueryService.searchSessionByName(query,
+                cursorId, size);
+        return ResponseEntity.ok(searchResponses);
+    }
 
     @PostMapping
     public ResponseEntity<SessionResponse> createSession(
