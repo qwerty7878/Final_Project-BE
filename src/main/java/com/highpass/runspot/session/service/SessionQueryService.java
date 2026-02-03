@@ -7,6 +7,7 @@ import com.highpass.runspot.session.domain.SessionStatus;
 import com.highpass.runspot.session.domain.dao.SessionRepository;
 import com.highpass.runspot.session.exception.SessionErrorCode;
 import com.highpass.runspot.session.exception.SessionException;
+import com.highpass.runspot.session.service.dto.response.SessionInfoSummaryResponse;
 import com.highpass.runspot.session.service.dto.response.SessionSearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -53,6 +54,12 @@ public class SessionQueryService {
                 .toList();
 
         return new SliceImpl<>(responses, pageable, hasNext);
+    }
+
+    public SessionInfoSummaryResponse getSessionSummary(final Long sessionId) {
+        final Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionException(SessionErrorCode.SESSION_NOT_FOUND));
+        return SessionInfoSummaryResponse.from(session);
     }
 
     private void validateQuery(final String query) {
