@@ -6,6 +6,7 @@ import com.highpass.runspot.session.service.SessionService;
 import com.highpass.runspot.session.service.dto.request.AttendanceUpdateRequest;
 import com.highpass.runspot.session.service.dto.request.SessionCreateRequest;
 import com.highpass.runspot.session.service.dto.request.SessionJoinRequest;
+import com.highpass.runspot.session.service.dto.response.SessionInfoDetailResponse;
 import com.highpass.runspot.session.service.dto.response.SessionInfoSummaryResponse;
 import com.highpass.runspot.session.service.dto.response.SessionParticipantResponse;
 import com.highpass.runspot.session.service.dto.response.SessionResponse;
@@ -47,8 +48,14 @@ public class SessionController {
     }
 
     @GetMapping("/{sessionId}/summary")
-    public ResponseEntity<SessionInfoSummaryResponse> getSessionSummary(@PathVariable Long sessionId) {
+    public ResponseEntity<SessionInfoSummaryResponse> getSessionSummary(@PathVariable final Long sessionId) {
         final SessionInfoSummaryResponse response = sessionQueryService.getSessionSummary(sessionId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{sessionId}")
+    public ResponseEntity<SessionInfoDetailResponse> getSessionDetail(@PathVariable final Long sessionId) {
+        final SessionInfoDetailResponse response = sessionQueryService.getSessionDetail(sessionId);
         return ResponseEntity.ok(response);
     }
 
