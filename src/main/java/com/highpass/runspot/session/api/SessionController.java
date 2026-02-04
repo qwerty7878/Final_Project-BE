@@ -14,6 +14,7 @@ import com.highpass.runspot.session.service.dto.response.SessionParticipantRespo
 import com.highpass.runspot.session.service.dto.response.SessionResponse;
 import com.highpass.runspot.session.service.dto.response.SessionSearchResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,8 @@ public class SessionController {
     @GetMapping("/search/nearby")
     public ResponseEntity<List<SessionNearbySearchResponse>> getSessionsNearby(
             @Valid @ModelAttribute final PositionBasedSearchCondition condition,
-            @RequestParam(name = "size", required = false, defaultValue = "3") final int size
+            @Valid @Positive(message = "응답 크기는 양수여야 합니다") @RequestParam(name = "size", required = false,
+                    defaultValue = "3") final int size
     ) {
         final List<SessionNearbySearchResponse> response = sessionQueryService.getSessionsNearby(condition, size);
         return ResponseEntity.ok(response);
