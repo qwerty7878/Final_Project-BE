@@ -37,6 +37,7 @@ import java.util.List;
 public class SessionQueryService {
 
     private static final double SEARCH_RADIUS_KM = 3.0;
+    private static final double METERS_IN_KM = 1000.0;
 
     private final SessionRepository sessionRepository;
     private final SessionParticipantRepository sessionParticipantRepository;
@@ -108,7 +109,7 @@ public class SessionQueryService {
                             (int) applicants,
                             session.getCapacity(),
                             session.getLocationName(),
-                            BigDecimal.valueOf(distanceMeter / 1000.0).setScale(1, RoundingMode.HALF_UP),
+                            BigDecimal.valueOf(distanceMeter / METERS_IN_KM).setScale(1, RoundingMode.HALF_UP),
                             session.getTargetDistanceKm(),
                             session.getAvgPaceSec(),
                             session.getStartAt()
