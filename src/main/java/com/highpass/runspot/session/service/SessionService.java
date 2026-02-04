@@ -3,6 +3,8 @@ package com.highpass.runspot.session.service;
 import com.highpass.runspot.auth.domain.Gender;
 import com.highpass.runspot.auth.domain.User;
 import com.highpass.runspot.auth.domain.dao.UserRepository;
+import com.highpass.runspot.auth.service.UserStatsService;
+import com.highpass.runspot.session.domain.AttendanceStatus;
 import com.highpass.runspot.session.domain.GenderPolicy;
 import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.domain.Session;
@@ -29,6 +31,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final SessionParticipantRepository sessionParticipantRepository;
     private final UserRepository userRepository;
+    private final UserStatsService userStatsService;
 
     @Transactional
     public SessionResponse createSession(Long userId, SessionCreateRequest request) {
@@ -193,7 +196,30 @@ public class SessionService {
             throw new IllegalArgumentException("해당 세션의 참여자가 아닙니다.");
         }
 
+        // 기존 출석 상태 확인
+        AttendanceStatus previousStatus = participant.getAttendanceStatus();
+
         participant.updateAttendance(request.attendanceStatus());
+
+        if (previousStatus != AttendanceStatus.ATTENDED
+                && request.attendanceStatus() == AttendanceStatus.ATTENDED) {
+            userStatsService.updateRunningStatsOnAttendance(
+                    participant.getUser().getId(),
+                    session.getTargetDistanceKm()
+            );
+        }
+    }
+
+    public List<SessionResponse> getMyHostedSessions(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
+
+        // OPEN 상태 우선, 그 다음 최신순으로 정렬하여 3개만 조회
+        List<Session> sessions = sessionRepository.findTop3ByHostUserOrderByStatusAscCreatedAtDesc(user);
+
+        return sessions.stream()
+                .map(SessionResponse::from)
+                .toList();
     }
 
     private void validateGenderPolicy(GenderPolicy policy, Gender userGender) {

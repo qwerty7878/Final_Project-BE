@@ -1,4 +1,4 @@
-package com.highpass.runspot.auth.api.dto;
+package com.highpass.runspot.auth.service.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.highpass.runspot.auth.domain.AgeGroup;

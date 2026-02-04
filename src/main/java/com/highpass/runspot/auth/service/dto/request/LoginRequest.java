@@ -1,4 +1,4 @@
-package com.highpass.runspot.auth.api.dto;
+package com.highpass.runspot.auth.service.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

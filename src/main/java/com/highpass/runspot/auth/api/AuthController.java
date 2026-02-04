@@ -1,11 +1,12 @@
 package com.highpass.runspot.auth.api;
 
-import com.highpass.runspot.auth.api.dto.LoginRequest;
-import com.highpass.runspot.auth.api.dto.LoginResponse;
-import com.highpass.runspot.auth.api.dto.SignupRequest;
-import com.highpass.runspot.auth.api.dto.SignupResponse;
+import com.highpass.runspot.auth.service.dto.request.LoginRequest;
+import com.highpass.runspot.auth.service.dto.response.LoginResponse;
+import com.highpass.runspot.auth.service.dto.request.SignupRequest;
+import com.highpass.runspot.auth.service.dto.response.SignupResponse;
 import com.highpass.runspot.auth.service.AuthService;
 import com.highpass.runspot.auth.domain.User;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "회원가입", description = "회원가입 기능입니다.")
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
         User user = authService.signup(request);
@@ -30,6 +32,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "로그인", description = "로그인 기능입니다.")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request,
@@ -39,6 +42,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "로그아웃", description = "로그인 된 계정의 세션을 만료합니다.")
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(HttpSession session) {
         authService.logout(session);
@@ -47,6 +51,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "회원탈퇴", description = "현재 로그인 된 세션을 기반으로 회원탈퇴합니다.")
     @DeleteMapping("/withdraw")
     public ResponseEntity<Map<String, String>> withdraw(HttpSession session) {
         authService.withdraw(session);
