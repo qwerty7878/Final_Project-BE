@@ -21,4 +21,14 @@ public class ErrorResponse {
                         .build()
                 );
     }
+
+    public static ResponseEntity<ErrorResponse> of(final org.springframework.http.HttpStatus status, final String message) {
+        return ResponseEntity
+                .status(status)
+                .body(ErrorResponse.builder()
+                        .status(status.value())
+                        .message(message)
+                        .build()
+                );
+    }
 }
