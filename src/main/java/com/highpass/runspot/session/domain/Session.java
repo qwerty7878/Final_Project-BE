@@ -104,7 +104,7 @@ public class Session extends BaseTimeEntity {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RoutePoint {
-        private BigDecimal lng;
-        private BigDecimal lat;
+        private BigDecimal x;
+        private BigDecimal y;
     }
 }

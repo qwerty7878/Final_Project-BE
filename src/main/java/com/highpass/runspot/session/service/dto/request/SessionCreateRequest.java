@@ -52,11 +52,11 @@ public record SessionCreateRequest(
         GenderPolicy genderPolicy
 ) {
     public record RoutePointDto(
-            BigDecimal lng,
-            BigDecimal lat //프론트에서 넘겨주는 값 보고 변경
+            BigDecimal x,
+            BigDecimal y //프론트에서 넘겨주는 값 보고 변경
     ) {
         public Session.RoutePoint toDomain() {
-            return new Session.RoutePoint(lng, lat);
+            return new Session.RoutePoint(x, y);
         }
     }
 
