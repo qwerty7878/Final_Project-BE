@@ -19,6 +19,9 @@ public interface SessionParticipantRepository extends JpaRepository<SessionParti
 
     List<SessionParticipant> findBySessionIdAndStatus(Long sessionId, ParticipationStatus status);
 
+    @Query("SELECT sp FROM SessionParticipant sp JOIN FETCH sp.user WHERE sp.session.id = :sessionId AND sp.status = :status")
+    List<SessionParticipant> findBySessionIdAndStatusWithUser(@Param("sessionId") Long sessionId, @Param("status") ParticipationStatus status);
+
     long countBySessionIdAndStatus(Long sessionId, ParticipationStatus status);
 
     // 신청한 러닝 목록 조회 (REQUESTED, APPROVED, REJECTED 상태만, 최신순)
