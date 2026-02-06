@@ -1,6 +1,5 @@
 package com.highpass.runspot.session.service;
 
-import static com.highpass.runspot.session.domain.ParticipationStatus.*;
 import static com.highpass.runspot.session.domain.SessionStatus.OPEN;
 
 import com.highpass.runspot.common.util.GeometryUtil;
@@ -89,8 +88,8 @@ public class SessionQueryService {
     }
 
     public List<SessionNearbySearchResponse> getSessionsNearby(final @Valid PositionBasedSearchCondition condition, final int limit) {
-        final Point currentPoint = GeometryUtil.createPoint(condition.lat(), condition.lng());
-        final Geometry searchArea = GeometryUtil.createBoundingBox(condition.lat(), condition.lng(), SEARCH_RADIUS_KM);
+        final Point currentPoint = GeometryUtil.createPoint(condition.y(), condition.x());
+        final Geometry searchArea = GeometryUtil.createBoundingBox(condition.y(), condition.x(), SEARCH_RADIUS_KM);
         
         final List<Session> sessions = sessionRepository.findNearestSessions(currentPoint, searchArea, PageRequest.of(0, limit));
 
@@ -99,7 +98,7 @@ public class SessionQueryService {
                     // note: 해당 쿼리에서 N+1발생 가능. 하지만 현재는 쿼리가 적게 나가므로 그대로 진행함.
                     final long applicants = sessionParticipantRepository.countBySessionIdAndStatus(session.getId(), ParticipationStatus.APPROVED);
                     final double distanceMeter = GeometryUtil.calculateDistance(
-                            condition.lat().doubleValue(), condition.lng().doubleValue(),
+                            condition.y().doubleValue(), condition.x().doubleValue(),
                             session.getLocation().getY(), session.getLocation().getX()
                     );
                     
