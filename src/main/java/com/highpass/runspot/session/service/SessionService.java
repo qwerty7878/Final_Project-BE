@@ -4,6 +4,7 @@ import com.highpass.runspot.auth.domain.Gender;
 import com.highpass.runspot.auth.domain.User;
 import com.highpass.runspot.auth.domain.dao.UserRepository;
 import com.highpass.runspot.auth.service.UserStatsService;
+import com.highpass.runspot.auth.service.dto.response.MyCreatedRunningsResponse;
 import com.highpass.runspot.session.domain.AttendanceStatus;
 import com.highpass.runspot.session.domain.GenderPolicy;
 import com.highpass.runspot.session.domain.ParticipationStatus;
@@ -210,7 +211,7 @@ public class SessionService {
         }
     }
 
-    public List<SessionResponse> getMyHostedSessions(Long userId) {
+    public List<MyCreatedRunningsResponse> getMyHostedSessions(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
 
@@ -218,7 +219,11 @@ public class SessionService {
         List<Session> sessions = sessionRepository.findTop3ByHostUserOrderByStatusAscCreatedAtDesc(user);
 
         return sessions.stream()
-                .map(SessionResponse::from)
+                .map(session -> {
+                    int currentParticipants = (int) sessionParticipantRepository
+                            .countBySessionIdAndStatus(session.getId(), ParticipationStatus.APPROVED);
+                    return MyCreatedRunningsResponse.from(session, currentParticipants);
+                })
                 .toList();
     }
 
