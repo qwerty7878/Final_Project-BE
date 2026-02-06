@@ -11,14 +11,17 @@ import com.highpass.runspot.session.domain.dao.SessionRepository;
 import com.highpass.runspot.session.exception.SessionErrorCode;
 import com.highpass.runspot.session.exception.SessionException;
 import com.highpass.runspot.session.service.dto.request.PositionBasedSearchCondition;
+import com.highpass.runspot.session.service.dto.request.RangeBasedMarkerSearchCondition;
 import com.highpass.runspot.session.service.dto.response.SessionInfoDetailResponse;
 import com.highpass.runspot.session.service.dto.response.SessionInfoSummaryResponse;
+import com.highpass.runspot.session.service.dto.response.SessionMarkerSearchResponse;
 import com.highpass.runspot.session.service.dto.response.SessionNearbySearchResponse;
 import com.highpass.runspot.session.service.dto.response.SessionSearchResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -114,6 +117,24 @@ public class SessionQueryService {
                             session.getStartAt()
                     );
                 })
+                .toList();
+    }
+
+    public List<SessionMarkerSearchResponse> getSessionsMarker(final @Valid RangeBasedMarkerSearchCondition condition) {
+        final Polygon area = GeometryUtil.createPolygon(
+                condition.leftX(), condition.rightY(),
+                condition.rightX(), condition.leftY()
+        );
+
+        final List<Session> sessions = sessionRepository.findWithinArea(area);
+
+        return sessions.stream()
+                .map(session -> new SessionMarkerSearchResponse(
+                        session.getId(),
+                        session.getTitle(),
+                        BigDecimal.valueOf(session.getLocation().getX()),
+                        BigDecimal.valueOf(session.getLocation().getY())
+                ))
                 .toList();
     }
 
