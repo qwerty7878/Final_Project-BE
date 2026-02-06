@@ -7,10 +7,12 @@ import com.highpass.runspot.session.service.SessionQueryService;
 import com.highpass.runspot.session.service.SessionService;
 import com.highpass.runspot.session.service.dto.request.AttendanceUpdateRequest;
 import com.highpass.runspot.session.service.dto.request.PositionBasedSearchCondition;
+import com.highpass.runspot.session.service.dto.request.RangeBasedMarkerSearchCondition;
 import com.highpass.runspot.session.service.dto.request.SessionCreateRequest;
 import com.highpass.runspot.session.service.dto.request.SessionJoinRequest;
 import com.highpass.runspot.session.service.dto.response.SessionInfoDetailResponse;
 import com.highpass.runspot.session.service.dto.response.SessionInfoSummaryResponse;
+import com.highpass.runspot.session.service.dto.response.SessionMarkerSearchResponse;
 import com.highpass.runspot.session.service.dto.response.SessionNearbySearchResponse;
 import com.highpass.runspot.session.service.dto.response.SessionParticipantResponse;
 import com.highpass.runspot.session.service.dto.response.SessionResponse;
@@ -71,6 +73,12 @@ public class SessionController {
                     defaultValue = "3") final int size
     ) {
         final List<SessionNearbySearchResponse> response = sessionQueryService.getSessionsNearby(condition, size);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search/markers")
+    public ResponseEntity<List<SessionMarkerSearchResponse>> getSessionsMarker(@Valid @ModelAttribute final RangeBasedMarkerSearchCondition condition) {
+        final List<SessionMarkerSearchResponse> response = sessionQueryService.getSessionsMarker(condition);
         return ResponseEntity.ok(response);
     }
 

@@ -36,6 +36,16 @@ public class GeometryUtil {
         });
     }
 
+    public static Polygon createPolygon(final BigDecimal minLon, final BigDecimal minLat, final BigDecimal maxLon, final BigDecimal maxLat) {
+        return geometryFactory.createPolygon(new Coordinate[]{
+                new Coordinate(minLon.doubleValue(), minLat.doubleValue()),
+                new Coordinate(maxLon.doubleValue(), minLat.doubleValue()),
+                new Coordinate(maxLon.doubleValue(), maxLat.doubleValue()),
+                new Coordinate(minLon.doubleValue(), maxLat.doubleValue()),
+                new Coordinate(minLon.doubleValue(), minLat.doubleValue())
+        });
+    }
+
     public static double calculateDistance(final double startLat, final double startLon, final double endLat, final double endLon) {
         final double deltaLatitude = Math.toRadians(endLat - startLat);
         final double deltaLongitude = Math.toRadians(endLon - startLon);

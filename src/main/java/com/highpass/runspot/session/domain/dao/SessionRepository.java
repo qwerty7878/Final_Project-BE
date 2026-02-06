@@ -37,4 +37,11 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
             ORDER BY function('ST_Distance_Sphere', s.location, :point)
             """)
     List<Session> findNearestSessions(@Param("point") Point point, @Param("area") Geometry area, Pageable pageable);
+
+    @Query("""
+            SELECT s FROM Session s
+            WHERE s.status = 'OPEN'
+            AND within(s.location, :area) = true
+            """)
+    List<Session> findWithinArea(@Param("area") Geometry area);
 }
