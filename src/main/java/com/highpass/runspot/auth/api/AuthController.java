@@ -10,13 +10,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -26,20 +30,59 @@ public class AuthController {
 
     @Operation(summary = "회원가입", description = "회원가입 기능입니다.")
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
-        User user = authService.signup(request);
-        SignupResponse response = SignupResponse.from(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest request) {
+        try {
+            log.info("=== Signup Request Start ===");
+            log.info("Username: {}", request.getUsername());
+            log.info("Name: {}", request.getName());
+            log.info("AgeGroup: {}", request.getAgeGroup());
+            log.info("Gender: {}", request.getGender());
+            log.info("WeeklyRuns: {}", request.getWeeklyRuns());
+            log.info("AvgPaceMinPerKm: {}", request.getAvgPaceMinPerKm());
+
+            User user = authService.signup(request);
+            log.info("User created successfully: {}", user.getId());
+
+            SignupResponse response = SignupResponse.from(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (Exception e) {
+            log.error("Signup failed", e);
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e.getClass().getSimpleName());
+            error.put("message", e.getMessage());
+
+            // 스택트레이스 추가
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            error.put("stackTrace", sw.toString());
+
+            if (e.getCause() != null) {
+                error.put("cause", e.getCause().toString());
+            }
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @Operation(summary = "로그인", description = "로그인 기능입니다.")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
             HttpSession session) {
-        User user = authService.login(request, session);
-        LoginResponse response = LoginResponse.from(user);
-        return ResponseEntity.ok(response);
+        try {
+            User user = authService.login(request, session);
+            LoginResponse response = LoginResponse.from(user);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Login failed", e);
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e.getClass().getSimpleName());
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
     @Operation(summary = "로그아웃", description = "로그인 된 계정의 세션을 만료합니다.")
