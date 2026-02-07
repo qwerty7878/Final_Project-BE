@@ -37,6 +37,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(info)
                 .servers(List.of(server, localServer))
+                .addSecurityItem(new SecurityRequirement().addList("cookieAuth"))
                 .components(new Components().addSecuritySchemes(
                         "cookieAuth",
                         new SecurityScheme()
