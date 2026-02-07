@@ -42,14 +42,20 @@ public class SecurityConfig {
                                 // Swagger / OpenAPI
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/sessions/**",
+                                "/users/**"
                         ).permitAll()
 
                         // 나머지는 로그인(세션) 필요
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(config -> config
-                        .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"" + authException.getMessage() + "\"}");
+                        })
                         .accessDeniedHandler(accessDeniedHandler())
                 )
                 .formLogin(form -> form.disable())
@@ -61,11 +67,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "http://localhost:8080",
-                "http://localhost:5173",
-                "https://api-ide.sjm00.link"
-        ));
+        config.setAllowedOriginPatterns(List.of("*"));
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 쿠키 허용
