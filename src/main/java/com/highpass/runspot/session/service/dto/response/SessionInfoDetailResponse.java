@@ -1,7 +1,6 @@
 package com.highpass.runspot.session.service.dto.response;
 
 import com.highpass.runspot.session.domain.GenderPolicy;
-import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.domain.RunType;
 import com.highpass.runspot.session.domain.Session;
 import com.highpass.runspot.session.domain.SessionParticipant;
@@ -20,7 +19,8 @@ public record SessionInfoDetailResponse(
         RunType runType,
         String hostName,
         BigDecimal hostMannerTemp,
-        List<String> participants
+        List<String> participants,
+        List<Session.RoutePoint> routePolyline
 ) {
     public static SessionInfoDetailResponse from(Session session, List<SessionParticipant> participants) {
         return new SessionInfoDetailResponse(
@@ -36,7 +36,8 @@ public record SessionInfoDetailResponse(
                 session.getHostUser().getMannerTemp(),
                 participants.stream()
                         .map(p -> p.getUser().getName())
-                        .toList()
+                        .toList(),
+                session.getRoutePolyline()
         );
     }
 }
