@@ -17,10 +17,10 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         // API 기본 설정
         Info info = new Info()
-                .title("WEB-IDE API Document")
+                .title("Run-Spot API Document")
                 .version("1.0")
                 .description(
-                        "[WEB-IDE].\n"
+                        "[Run-Spot].\n"
                 );
 
         // Server 설정
@@ -37,13 +37,12 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(info)
                 .servers(List.of(server, localServer))
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components().addSecuritySchemes(
-                        "bearerAuth",
+                        "cookieAuth",
                         new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
+                                .type(SecurityScheme.Type.APIKEY)
+                                .in(SecurityScheme.In.COOKIE)
+                                .name("JSESSIONID")
                 ));
     }
 }
