@@ -1,21 +1,15 @@
 package com.highpass.runspot.common.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,37 +23,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authorizeHttpRequests(auth -> auth
-                        // 프리플라이트 요청은 항상 허용 (브라우저 CORS 안정화)
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // 인증 없이 허용할 엔드포인트
-                        .requestMatchers(
-                                "/auth/**",
-
-                                // Swagger / OpenAPI
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/sessions/**",
-                                "/users/**"
-                        ).permitAll()
-
-                        // 나머지는 로그인(세션) 필요
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(config -> config
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"" + authException.getMessage() + "\"}");
-                        })
-                        .accessDeniedHandler(accessDeniedHandler())
-                )
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()) // 🔓 모든 요청 허용
                 .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable());
+                .httpBasic(basic -> basic.disable())
+                .logout(logout -> logout.disable());
 
         return http.build();
     }
@@ -67,24 +36,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
-
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // 쿠키 허용
-        config.setExposedHeaders(List.of("Set-Cookie"));
+        config.setAllowedOriginPatterns(List.of("*")); // 모든 origin 허용
+        config.setAllowedMethods(List.of("*")); // 모든 method 허용
+        config.setAllowedHeaders(List.of("*")); // 모든 header 허용
+        config.setAllowCredentials(true);
+        config.setExposedHeaders(List.of("*"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("Access Denied!");
-        };
     }
 
     @Bean

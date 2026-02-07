@@ -37,10 +37,7 @@ spring:
       on-profile: prod
 
 server:
-  forward-headers-strategy: framework
   servlet:
     session:
       cookie:
-        http-only: true
         secure: true
-        same-site: none
