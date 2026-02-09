@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +33,14 @@ import java.util.Random;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Profile("!prod") // 운영 환경이 아닐 때만 실행
+// @Profile("!prod") 제거: 서버 환경에서도 데이터가 없으면 실행되도록 변경
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
     private final SessionParticipantRepository sessionParticipantRepository;
     private final UserRunningStatsRepository userRunningStatsRepository;
-    // PasswordEncoder 제거
+    // PasswordEncoder 제거 (AuthService 평문 비교 로직에 맞춤)
 
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     private final Random random = new Random();
@@ -59,7 +58,7 @@ public class DataInitializer implements CommandLineRunner {
         // 1. 유저 생성
         List<User> users = createUsers();
 
-        // 2. 세션 및 참여자 생성
+        // 2. 세션 및 참여자 생성 (여의도 집중)
         createSessions(users);
 
         log.info("더미 데이터 생성이 완료되었습니다.");
@@ -67,8 +66,8 @@ public class DataInitializer implements CommandLineRunner {
 
     private List<User> createUsers() {
         List<User> users = new ArrayList<>();
-        // 비밀번호 평문 저장
-        String password = "1234";
+        // 비밀번호 변경: 영문+숫자 포함 8자리 이상
+        String password = "password1234";
 
         // Admin User
         User admin = User.builder()
