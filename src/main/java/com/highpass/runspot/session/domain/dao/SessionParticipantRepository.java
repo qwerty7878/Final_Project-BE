@@ -26,6 +26,8 @@ public interface SessionParticipantRepository extends JpaRepository<SessionParti
 
     // 신청한 러닝 목록 조회 (REQUESTED, APPROVED, REJECTED 상태만, 최신순)
     @Query("SELECT sp FROM SessionParticipant sp " +
+            "JOIN FETCH sp.session s " +
+            "JOIN FETCH sp.user u " +
             "WHERE sp.user.id = :userId " +
             "AND sp.status IN ('REQUESTED', 'APPROVED', 'REJECTED') " +
             "ORDER BY sp.createdAt DESC")
@@ -33,10 +35,12 @@ public interface SessionParticipantRepository extends JpaRepository<SessionParti
 
     // 최근 참여 내역 조회 (출석한 세션만, 최신순 3개)
     @Query("SELECT sp FROM SessionParticipant sp " +
+            "JOIN FETCH sp.session s " +
+            "JOIN FETCH sp.user u " +
             "WHERE sp.user.id = :userId " +
             "AND sp.status = 'APPROVED' " +
             "AND sp.attendanceStatus = 'ATTENDED' " +
-            "ORDER BY sp.session.startAt DESC")
+            "ORDER BY s.startAt DESC")
     List<SessionParticipant> findRecentAttendedRunnings(@Param("userId") Long userId, Pageable pageable);
 
     // 출석 처리된 세션 개수

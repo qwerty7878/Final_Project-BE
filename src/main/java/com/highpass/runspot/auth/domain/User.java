@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,4 +56,95 @@ public class User {
     @Column(name = "pace_preference_sec", nullable = false)
     @Builder.Default
     private Integer pacePreferenceSec = 360; // 평균 페이스(설정값, 초/km)
+
+    // 제재 관리 필드들
+    @Column(name = "consecutive_no_show_count", nullable = false)
+    @Builder.Default
+    private Integer consecutiveNoShowCount = 0; // 연속 노쇼 횟수
+
+    @Column(name = "suspension_end_date")
+    private LocalDateTime suspensionEndDate; // 이용 제한 종료 시각
+
+    @Column(name = "suspension_count", nullable = false)
+    @Builder.Default
+    private Integer suspensionCount = 0; // 이용 제한 받은 횟수
+
+    @Column(name = "is_permanently_banned", nullable = false)
+    @Builder.Default
+    private Boolean isPermanentlyBanned = false; // 영구 정지 여부
+
+    // UserSuspensionManager 생성
+    private UserSuspensionManager getSuspensionManager() {
+        return new UserSuspensionManager(
+                consecutiveNoShowCount,
+                suspensionEndDate,
+                suspensionCount,
+                isPermanentlyBanned,
+                mannerTemp
+        );
+    }
+
+    // 상태 업데이트
+    private void updateFromManager(UserSuspensionManager manager) {
+        this.consecutiveNoShowCount = manager.getConsecutiveNoShowCount();
+        this.suspensionEndDate = manager.getSuspensionEndDate();
+        this.suspensionCount = manager.getSuspensionCount();
+        this.isPermanentlyBanned = manager.getIsPermanentlyBanned();
+        this.mannerTemp = manager.getMannerTemp();
+    }
+
+    // 위임 메서드들
+
+    public boolean isPermanentlyBanned() {
+        return getSuspensionManager().isPermanentlyBanned();
+    }
+
+    public boolean isSuspended() {
+        return getSuspensionManager().isSuspended();
+    }
+
+    public boolean isActive() {
+        return getSuspensionManager().isActive();
+    }
+
+    public boolean canCreateSession() {
+        return getSuspensionManager().canCreateSessionByTemp();
+    }
+
+    public boolean hasWarning() {
+        return getSuspensionManager().hasWarning();
+    }
+
+    public UserSuspensionManager.SuspensionLevel getSuspensionLevel() {
+        return getSuspensionManager().getSuspensionLevel();
+    }
+
+    //상태 변경 메서드
+
+    public void recordNoShow() {
+        UserSuspensionManager manager = getSuspensionManager();
+        manager.recordNoShow();
+        updateFromManager(manager);
+    }
+
+    public void recordAttendance() {
+        UserSuspensionManager manager = getSuspensionManager();
+        manager.recordAttendance();
+        updateFromManager(manager);
+    }
+
+    public void clearSuspension() {
+        UserSuspensionManager manager = getSuspensionManager();
+        manager.clearTemporarySuspension();
+        updateFromManager(manager);
+    }
+
+    // 제재 횟수 조회 (에러 메시지용)
+    public Integer getSuspensionCount() {
+        return suspensionCount;
+    }
+
+    public LocalDateTime getSuspensionEndDate() {
+        return suspensionEndDate;
+    }
 }
