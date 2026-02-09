@@ -36,4 +36,17 @@ public class ApiExceptionHandler {
         log.error("ValidationException: {}", errorMessage);
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, errorMessage);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(final IllegalStateException e) {
+        log.error("IllegalStateException: {}", e.getMessage());
+
+        // 로그인 필요 메시지는 401로 내려주기
+        if ("로그인이 필요합니다.".equals(e.getMessage())) {
+            return ErrorResponse.of(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+
+        // 그 외 IllegalStateException은 상황에 따라 400 또는 500 (일단 400 권장)
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
 }
