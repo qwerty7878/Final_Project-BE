@@ -46,7 +46,6 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        // 변경: 전체 count가 아니라 'admin' 계정 존재 여부로 판단
         if (userRepository.existsByUsername("admin")) {
             log.info("Admin 계정이 이미 존재하여 더미 데이터 생성을 건너뜁니다.");
             return;
@@ -54,10 +53,10 @@ public class DataInitializer implements CommandLineRunner {
 
         log.info("더미 데이터 생성을 시작합니다...");
 
-        // 1. 유저 생성
+        // 1. 유저 생성 (다양한 스펙)
         List<User> users = createUsers();
 
-        // 2. 세션 및 참여자 생성 (여의도 집중)
+        // 2. 세션 및 참여자 생성 (을지로 위주)
         createSessions(users);
 
         log.info("더미 데이터 생성이 완료되었습니다.");
@@ -65,7 +64,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private List<User> createUsers() {
         List<User> users = new ArrayList<>();
-        // 비밀번호: 영문+숫자 포함 8자리 이상
         String password = "12341234";
 
         // Admin User
@@ -75,25 +73,41 @@ public class DataInitializer implements CommandLineRunner {
                 .name("관리자")
                 .ageGroup(AgeGroup.THIRTIES)
                 .gender(Gender.MALE)
-                .weeklyRunningGoal(5)
-                .pacePreferenceSec(300)
+                .mannerTemp(BigDecimal.valueOf(99.9))
+                .weeklyRunningGoal(7)
+                .pacePreferenceSec(300) // 5분 페이스
                 .build();
         users.add(userRepository.save(admin));
         userRunningStatsRepository.save(UserRunningStats.builder().user(admin).build());
 
-        // Normal Users
-        for (int i = 1; i <= 15; i++) {
+        // Normal Users (20명)
+        for (int i = 1; i <= 20; i++) {
             Gender gender = (i % 2 == 0) ? Gender.FEMALE : Gender.MALE;
-            AgeGroup ageGroup = (i % 3 == 0) ? AgeGroup.TWENTIES : AgeGroup.THIRTIES;
             
+            // 나이대 다양화
+            AgeGroup ageGroup;
+            int ageRand = random.nextInt(100);
+            if (ageRand < 30) ageGroup = AgeGroup.TWENTIES;      // 30%
+            else if (ageRand < 60) ageGroup = AgeGroup.THIRTIES; // 30%
+            else if (ageRand < 85) ageGroup = AgeGroup.FORTIES;  // 25%
+            else ageGroup = AgeGroup.FIFTIES;                    // 15%
+
+            // 매너온도 (30.0 ~ 45.0)
+            double temp = 30.0 + (random.nextDouble() * 15.0);
+            BigDecimal mannerTemp = BigDecimal.valueOf(temp).setScale(1, BigDecimal.ROUND_HALF_UP);
+
+            // 페이스 (4분 ~ 8분)
+            int pace = 240 + random.nextInt(241);
+
             User user = User.builder()
                     .username("user" + i)
                     .password(password)
                     .name("러너" + i)
                     .ageGroup(ageGroup)
                     .gender(gender)
-                    .weeklyRunningGoal(random.nextInt(5) + 1)
-                    .pacePreferenceSec(300 + random.nextInt(180)) // 5분 ~ 8분 페이스
+                    .mannerTemp(mannerTemp)
+                    .weeklyRunningGoal(random.nextInt(7) + 1)
+                    .pacePreferenceSec(pace)
                     .build();
             
             users.add(userRepository.save(user));
@@ -103,46 +117,51 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createSessions(List<User> users) {
-        // 여의도 한강공원 중심 좌표 (여의나루역 인근)
-        double centerX = 126.9347;
-        double centerY = 37.5284;
-
-        String[] titles = {
-                "여의도 한강 야간 러닝", "여의나루역 집결 5km", "주말 아침 여의도 공원", 
-                "초보자 환영 천천히 뜁니다", "여의도 인터벌 훈련", "퇴근 후 여의도 스트레스 해소",
-                "63빌딩 앞 집결", "국회의사당 한바퀴", "마포대교 건너기", "샛강생태공원 러닝"
+        // 을지로 주요 스팟 좌표
+        // 1. 청계천 (을지로3가역 북쪽)
+        // 2. 을지로 노가리 골목 (을지로3가역 인근)
+        // 3. 세운상가 (종로3가~을지로4가 사이)
+        // 4. 명동성당 (을지로 입구 쪽)
+        double[][] safeZones = {
+            {126.9925, 37.5685}, // 청계천 (장교교 인근)
+            {126.9905, 37.5665}, // 을지로3가역 (노가리 골목)
+            {126.9955, 37.5670}, // 세운상가 앞
+            {126.9870, 37.5630}  // 명동성당 인근
         };
 
-        for (int i = 0; i < 20; i++) {
+        String[] titles = {
+                "퇴근 후 힙지로 러닝", "청계천 야간 5km", "을지로 골목 탐방 러닝", 
+                "세운상가 한바퀴", "명동성당 찍고 오기", "초보자 환영 천천히 뜁니다",
+                "도심 속 시티런", "러닝 끝나고 만선호프?", "주말 아침 청계천", "직장인 스트레스 해소"
+        };
+
+        for (int i = 0; i < 25; i++) {
             User host = users.get(random.nextInt(users.size()));
             
-            // 여의도 중심 반경 약 1km 내 랜덤 분포
-            // 0.01도 ≈ 1.1km
-            double startX = centerX + (random.nextDouble() - 0.5) * 0.015;
-            double startY = centerY + (random.nextDouble() - 0.5) * 0.010;
+            // 안전 구역 중 하나 선택 후 약간의 랜덤 오차
+            double[] zone = safeZones[random.nextInt(safeZones.length)];
+            double startX = zone[0] + (random.nextDouble() - 0.5) * 0.003;
+            double startY = zone[1] + (random.nextDouble() - 0.5) * 0.003;
             
             Point location = geometryFactory.createPoint(new Coordinate(startX, startY));
-
-            // 경로 생성 (시작점 주변을 도는 폴리라인)
             List<Session.RoutePoint> route = createDummyRoute(startX, startY);
 
             Session session = Session.builder()
                     .hostUser(host)
                     .title(titles[random.nextInt(titles.length)])
                     .runType(RunType.values()[random.nextInt(RunType.values().length)])
-                    .locationName("여의도 한강공원")
+                    .locationName("을지로 일대")
                     .location(location)
                     .routePolyline(route)
                     .targetDistanceKm(BigDecimal.valueOf(3 + random.nextInt(7))) // 3~10km
-                    .avgPaceSec(300 + random.nextInt(180))
-                    .startAt(LocalDateTime.now().plusDays(random.nextInt(7)).plusHours(random.nextInt(12)))
-                    .capacity(3 + random.nextInt(8)) // 3~10명
+                    .avgPaceSec(300 + random.nextInt(240)) // 5분~9분
+                    .startAt(LocalDateTime.now().plusDays(random.nextInt(14)).plusHours(random.nextInt(12))) // 2주 내
+                    .capacity(3 + random.nextInt(10)) // 3~12명
                     .genderPolicy(GenderPolicy.MIXED)
                     .build();
 
             sessionRepository.save(session);
 
-            // 호스트 외 다른 참가자 추가
             addParticipants(session, users, host);
         }
     }
@@ -154,11 +173,10 @@ public class DataInitializer implements CommandLineRunner {
         
         route.add(new Session.RoutePoint(BigDecimal.valueOf(currentX), BigDecimal.valueOf(currentY)));
 
-        // 5~8개의 점을 이어 경로 생성
-        for (int i = 0; i < 5 + random.nextInt(4); i++) {
-            // 0.002도 약 200m 이동
-            currentX += (random.nextDouble() - 0.5) * 0.004;
-            currentY += (random.nextDouble() - 0.5) * 0.004;
+        // 5~10개의 점을 이어 경로 생성
+        for (int i = 0; i < 5 + random.nextInt(6); i++) {
+            currentX += (random.nextDouble() - 0.5) * 0.002; // 약 100m 이동
+            currentY += (random.nextDouble() - 0.5) * 0.002;
             route.add(new Session.RoutePoint(BigDecimal.valueOf(currentX), BigDecimal.valueOf(currentY)));
         }
         return route;
@@ -167,19 +185,29 @@ public class DataInitializer implements CommandLineRunner {
     private void addParticipants(Session session, List<User> users, User host) {
         int participantCount = random.nextInt(session.getCapacity()); // 0 ~ 정원 미만
         
+        String[] messages = {
+            "잘 부탁드립니다!", "열심히 뛰겠습니다", "초보인데 괜찮을까요?", 
+            "시간 맞춰 가겠습니다", "안녕하세요~", "반갑습니다!", "화이팅!"
+        };
+
         for (int i = 0; i < participantCount; i++) {
             User user = users.get(random.nextInt(users.size()));
-            if (user.getId().equals(host.getId())) continue; // 호스트 제외
-            
-            // 이미 참여했는지 확인
+            if (user.getId().equals(host.getId())) continue;
             if (sessionParticipantRepository.existsBySessionAndUser(session, user)) continue;
+
+            // 상태 랜덤 설정 (승인 70%, 요청중 20%, 거절 10%)
+            ParticipationStatus status;
+            int statusRand = random.nextInt(100);
+            if (statusRand < 70) status = ParticipationStatus.APPROVED;
+            else if (statusRand < 90) status = ParticipationStatus.REQUESTED;
+            else status = ParticipationStatus.REJECTED;
 
             SessionParticipant participant = SessionParticipant.builder()
                     .session(session)
                     .user(user)
-                    .status(ParticipationStatus.APPROVED)
-                    .attendanceStatus(AttendanceStatus.ABSENT)
-                    .messageToHost("잘 부탁드립니다!")
+                    .status(status)
+                    .attendanceStatus(AttendanceStatus.ABSENT) // 기본값
+                    .messageToHost(messages[random.nextInt(messages.length)])
                     .build();
             
             sessionParticipantRepository.save(participant);
