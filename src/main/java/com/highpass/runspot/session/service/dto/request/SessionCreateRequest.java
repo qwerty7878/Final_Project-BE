@@ -5,7 +5,6 @@ import com.highpass.runspot.common.util.GeometryUtil;
 import com.highpass.runspot.session.domain.GenderPolicy;
 import com.highpass.runspot.session.domain.RunType;
 import com.highpass.runspot.session.domain.Session;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,7 +40,7 @@ public record SessionCreateRequest(
         Integer avgPaceSec,
 
         @NotNull(message = "시작 시간은 필수입니다.")
-        @Future(message = "시작 시간은 현재 시간 이후여야 합니다.")
+        // @Future(message = "시작 시간은 현재 시간 이후여야 합니다.") // 제거
         LocalDateTime startAt,
 
         @NotNull(message = "모집 인원은 필수입니다.")
