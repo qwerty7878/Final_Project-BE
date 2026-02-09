@@ -1,7 +1,5 @@
 package com.highpass.runspot.session.api;
 
-import static com.highpass.runspot.auth.service.AuthService.SESSION_USER_KEY;
-
 import com.highpass.runspot.session.domain.ParticipationStatus;
 import com.highpass.runspot.session.service.SessionQueryService;
 import com.highpass.runspot.session.service.SessionService;
