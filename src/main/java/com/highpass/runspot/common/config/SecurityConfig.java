@@ -42,7 +42,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of(
                 "https://runspot-one.vercel.app",
-                "http://localhost:5173"));
+                "http://localhost:5173",
+                "https://api-ide.sjm00.link")); // Swagger UI 도메인 추가
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("*"));
