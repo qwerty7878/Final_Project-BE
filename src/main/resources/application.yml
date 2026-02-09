@@ -15,9 +15,6 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
-  session:
-    store-type: none # 기본 인메모리 세션 사용
-    timeout: 1800 # 30분 (초 단위)
 
 server:
   port: 8080
@@ -28,7 +25,7 @@ server:
         name: JSESSIONID # 세션 쿠키 이름
         http-only: true # XSS 공격 방지
         secure: false # 개발 환경에서는 false, 프로덕션에서는 true (HTTPS 필요)
-        same-site: lax # CSRF 공격 방지
+        same-site: none # CSRF 공격 방지
 
 ---
 spring:
