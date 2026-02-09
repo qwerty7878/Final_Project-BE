@@ -33,14 +33,12 @@ import java.util.Random;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-// @Profile("!prod") 제거: 서버 환경에서도 데이터가 없으면 실행되도록 변경
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
     private final SessionParticipantRepository sessionParticipantRepository;
     private final UserRunningStatsRepository userRunningStatsRepository;
-    // PasswordEncoder 제거 (AuthService 평문 비교 로직에 맞춤)
 
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     private final Random random = new Random();
@@ -48,8 +46,9 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        if (userRepository.count() > 0) {
-            log.info("이미 데이터가 존재하여 더미 데이터 생성을 건너뜁니다.");
+        // 변경: 전체 count가 아니라 'admin' 계정 존재 여부로 판단
+        if (userRepository.existsByUsername("admin")) {
+            log.info("Admin 계정이 이미 존재하여 더미 데이터 생성을 건너뜁니다.");
             return;
         }
 
@@ -66,8 +65,8 @@ public class DataInitializer implements CommandLineRunner {
 
     private List<User> createUsers() {
         List<User> users = new ArrayList<>();
-        // 비밀번호 변경: 영문+숫자 포함 8자리 이상
-        String password = "password1234";
+        // 비밀번호: 영문+숫자 포함 8자리 이상
+        String password = "12341234";
 
         // Admin User
         User admin = User.builder()
