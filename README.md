@@ -1,7 +1,6 @@
 ## 📺 서비스 화면
 
 ---
-https://github.com/user-attachments/assets/8e271f45-44bd-4d4b-9bf1-d87fc9d90eea
 
 ## 📜 서비스 소개
 
