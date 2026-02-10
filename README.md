@@ -7,7 +7,7 @@
 
 ![스크린샷 2026-02-10 오전 9.32.09.png](attachment:9f1c068e-2621-4b80-835c-e2d7f179d04c:스크린샷_2026-02-10_오전_9.32.09.png)
 
-[[runspot_시연 2 (1) (1).mp4]([attachment:f3b6102a-6841-4cfb-bf11-28b227aa43bc:runspot_%E1%84%89%E1%85%B5%E1%84%8B%E1%85%A7%E1%86%AB_2_(1)_(1).mp4](https://github.com/user-attachments/assets/8e271f45-44bd-4d4b-9bf1-d87fc9d90eea))](attachment:f3b6102a-6841-4cfb-bf11-28b227aa43bc:runspot_시연_2_(1)_(1).mp4)
+https://github.com/user-attachments/assets/8e271f45-44bd-4d4b-9bf1-d87fc9d90eea
 
 ## 📜 서비스 소개
 
